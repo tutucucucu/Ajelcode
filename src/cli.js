@@ -12,10 +12,8 @@ import ora from 'ora';
 initConfig();
 const config = loadConfig();
 
-// ASCII Banner
 console.log(chalk.cyan(figlet.textSync('AjelCode', { font: 'Standard' })));
 
-// Whale Song Animation
 const whaleSong = `
   ~♪~  ♪~♪  ~♪~  ♪~♪
    \\\\  /  \\\\  /  \\\\  /
@@ -28,9 +26,8 @@ console.log(chalk.magenta('🐋 "Sing with the whale, code with the AI!"'));
 program
   .name('ajelcode')
   .description('AI Coding Assistant with Session Management')
-  .version('1.0.0');
+  .version('1.0.2');
 
-// Main Interactive Menu
 program
   .command('start')
   .description('Start interactive session')
@@ -38,7 +35,6 @@ program
     await interactiveMenu();
   });
 
-// Chat Command
 program
   .command('chat [prompt]')
   .description('Chat with AI')
@@ -70,7 +66,6 @@ program
     }
   });
 
-// Session Management
 program
   .command('session')
   .description('Manage chat sessions')
@@ -110,7 +105,6 @@ program
     }
   });
 
-// Config Management
 program
   .command('config')
   .description('Manage configuration')
@@ -142,7 +136,6 @@ program
     }
   });
 
-// API Key Management
 program
   .command('api')
   .description('Manage API keys')
@@ -150,7 +143,6 @@ program
     await manageAPIKeys();
   });
 
-// Default command (quick generate)
 program
   .argument('[prompt]', 'Your coding request')
   .option('-f, --file <path>', 'Read prompt from file')
@@ -187,7 +179,6 @@ program
     }
   });
 
-// Interactive Menu Function
 async function interactiveMenu() {
   console.clear();
   console.log(chalk.cyan(figlet.textSync('AjelCode', { font: 'Standard' })));
@@ -338,7 +329,6 @@ async function interactiveMenu() {
   }
 }
 
-// Error handling for uncaught exceptions
 process.on('uncaughtException', (error) => {
   console.error(chalk.red('Uncaught Exception:'), error.message);
   if (error.stack) {
