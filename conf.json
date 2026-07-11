@@ -1,7 +1,7 @@
 {
   "prefix": true,
   "model": "llama-3.3-70b-versatile",
-  "apiKey": "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",
+  "apiKey": "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",
   "temperature": 0.1,
   "maxTokens": 4096,
   "colors": true
