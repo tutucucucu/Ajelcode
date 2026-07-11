@@ -1,139 +1,70 @@
-import Groq from 'groq-sdk';
-import { loadConfig } from './config.js';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { homedir } from 'os';
 
-const SESSION_FILE = join(process.cwd(), '.ajelcode_session.json');
+const CONFIG_NAME = 'conf.json';
+const LOCAL_CONFIG = join(process.cwd(), CONFIG_NAME);
+const GLOBAL_CONFIG = join(homedir(), '.ajelcode', CONFIG_NAME);
 
-export async function askAI(prompt, options = {}) {
-  const config = loadConfig();
-  const apiKey = options.apiKey || config.apiKey || process.env.GROQ_API_KEY;
+const DEFAULT_CONFIG = {
+  prefix: true,
+  model: 'llama-3.3-70b-versatile',
+  apiKey: null,
+  temperature: 0.1,
+  maxTokens: 4096,
+  colors: true,
+  browserToken: null
+};
+
+export function loadConfig() {
+  let config = { ...DEFAULT_CONFIG };
   
-  if (!apiKey) {
-    throw new Error('API key not found. Set in conf.json or GROQ_API_KEY env');
-  }
-
-  const client = new Groq({
-    apiKey: apiKey
-  });
-
-  const systemPrompt = `You are AjelCode, an AI coding assistant. Your ONLY job is to generate code files.
-
-CRITICAL OUTPUT FORMAT - YOU MUST FOLLOW EXACTLY:
-For each file you create, use this EXACT format:
-### FILE: path/filename.ext
-[the complete code content here]
-
-For folders:
-### FOLDER: path/folder_name
-
-RULES:
-- Start EVERY response with ### FILE:
-- Include the FULL path for every file
-- Put the COMPLETE code between ### FILE: and the next marker
-- If multiple files, repeat the ### FILE: format
-- NO explanations, NO markdown, NO backticks, NO extra text
-- Just the ### FILE: markers and code
-
-EXAMPLE OUTPUT:
-### FILE: hello.js
-console.log('Hello Ajel');
-
-### FILE: index.html
-<!DOCTYPE html>
-<html>...</html>
-
-### FOLDER: src/utils
-
-Now generate code for the user's request.`;
-
-  const model = options.model || config.model || 'llama-3.3-70b-versatile';
-
-  try {
-    // Load session history if available
-    let messages = [
-      { role: 'system', content: systemPrompt }
-    ];
-
-    if (options.useSession !== false) {
-      const session = getSession();
-      if (session && session.length > 0) {
-        messages = messages.concat(session);
-      }
+  if (existsSync(LOCAL_CONFIG)) {
+    try {
+      const local = JSON.parse(readFileSync(LOCAL_CONFIG, 'utf-8'));
+      config = { ...config, ...local };
+    } catch (error) {
+      console.error('Error reading local config:', error.message);
     }
-
-    messages.push({ role: 'user', content: prompt });
-
-    const response = await client.chat.completions.create({
-      model: model,
-      messages: messages,
-      temperature: parseFloat(config.temperature) || 0.1,
-      max_tokens: parseInt(config.maxTokens) || 4096,
-    });
-
-    const content = response.choices[0].message.content;
-
-    // Save to session
-    if (options.useSession !== false) {
-      saveToSession(prompt, content);
-    }
-
-    return content;
-  } catch (error) {
-    throw new Error('AI Error: ' + error.message);
   }
+  
+  if (existsSync(GLOBAL_CONFIG)) {
+    try {
+      const global = JSON.parse(readFileSync(GLOBAL_CONFIG, 'utf-8'));
+      config = { ...config, ...global };
+    } catch (error) {
+      console.error('Error reading global config:', error.message);
+    }
+  }
+  
+  return config;
 }
 
-export function getSession() {
-  try {
-    if (existsSync(SESSION_FILE)) {
-      const data = JSON.parse(readFileSync(SESSION_FILE, 'utf-8'));
-      return data.messages || [];
-    }
-  } catch (error) {
-    console.error('Error reading session:', error.message);
+export function saveConfig(config, global = false) {
+  const targetPath = global ? GLOBAL_CONFIG : LOCAL_CONFIG;
+  const dir = global ? join(homedir(), '.ajelcode') : process.cwd();
+  
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
   }
-  return [];
+  
+  writeFileSync(targetPath, JSON.stringify(config, null, 2));
 }
 
-export function saveToSession(prompt, response) {
-  try {
-    let session = { messages: [] };
-    if (existsSync(SESSION_FILE)) {
-      session = JSON.parse(readFileSync(SESSION_FILE, 'utf-8'));
-    }
-    
-    session.messages.push(
-      { role: 'user', content: prompt },
-      { role: 'assistant', content: response }
-    );
-    
-    // Keep last 50 messages to avoid overflow
-    if (session.messages.length > 50) {
-      session.messages = session.messages.slice(-50);
-    }
-    
-    session.timestamp = new Date().toISOString();
-    writeFileSync(SESSION_FILE, JSON.stringify(session, null, 2));
-  } catch (error) {
-    console.error('Error saving session:', error.message);
-  }
+export function getConfigValue(key) {
+  const config = loadConfig();
+  return config[key];
 }
 
-export function clearSession() {
-  try {
-    if (existsSync(SESSION_FILE)) {
-      writeFileSync(SESSION_FILE, JSON.stringify({ messages: [], timestamp: new Date().toISOString() }, null, 2));
-    }
-  } catch (error) {
-    console.error('Error clearing session:', error.message);
-  }
+export function setConfigValue(key, value, global = false) {
+  const config = loadConfig();
+  config[key] = value;
+  saveConfig(config, global);
 }
 
-export function setSession(messages) {
-  try {
-    writeFileSync(SESSION_FILE, JSON.stringify({ messages, timestamp: new Date().toISOString() }, null, 2));
-  } catch (error) {
-    console.error('Error setting session:', error.message);
+export function initConfig() {
+  if (!existsSync(LOCAL_CONFIG)) {
+    saveConfig(DEFAULT_CONFIG, false);
+    console.log('Created local conf.json');
   }
 }
