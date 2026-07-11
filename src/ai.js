@@ -1,4 +1,4 @@
-import Groq from 'groq-sdk';
+import axios from 'axios';
 import { loadConfig } from './config.js';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
@@ -12,11 +12,6 @@ export async function askAI(prompt, options = {}) {
   if (!apiKey) {
     throw new Error('API key not found. Set in conf.json or GROQ_API_KEY env');
   }
-
-  const client = new Groq({
-    apiKey: apiKey,
-    timeout: 60000
-  });
 
   const systemPrompt = `You are AjelCode, an AI coding assistant. Your ONLY job is to generate code files.
 
@@ -40,91 +35,80 @@ EXAMPLE OUTPUT:
 ### FILE: hello.js
 console.log('Hello Ajel');
 
+### FILE: index.html
+<!DOCTYPE html>
+<html>...</html>
+
+### FOLDER: src/utils
+
 Now generate code for the user's request.`;
 
   const model = options.model || config.model || 'llama-3.3-70b-versatile';
 
-  try {
-    // Load session history if available
-    let messages = [
-      { role: 'system', content: systemPrompt }
-    ];
+  let messages = [
+    { role: 'system', content: systemPrompt }
+  ];
 
-    if (options.useSession !== false) {
-      const session = getSession();
-      if (session && session.length > 0) {
-        messages = messages.concat(session);
-      }
+  if (options.useSession !== false) {
+    const session = getSession();
+    if (session && session.length > 0) {
+      messages = messages.concat(session);
     }
+  }
 
-    messages.push({ role: 'user', content: prompt });
+  messages.push({ role: 'user', content: prompt });
 
-    // Batasi history agar request tidak terlalu besar
-    if (messages.length > 21) {
-      messages = [messages[0], ...messages.slice(-20)];
-    }
+  // Batasi history agar request tidak terlalu besar
+  if (messages.length > 21) {
+    messages = [messages[0], ...messages.slice(-20)];
+  }
 
-    let response;
-    let lastError;
-
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        response = await client.chat.completions.create({
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      console.log(`Attempt ${attempt}...`);
+      
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
           model: model,
           messages: messages,
           temperature: Number(config.temperature ?? 0.1),
-          max_completion_tokens: Number(config.maxTokens ?? 4096),
-          stream: false,
-        });
-        break;
-      } catch (err) {
-        lastError = err;
-
-        // Retry jika koneksi terputus
-        if (
-          attempt < 3 &&
-          (
-            err.message?.includes('Premature close') ||
-            err.message?.includes('ECONNRESET') ||
-            err.message?.includes('fetch failed') ||
-            err.message?.includes('socket hang up')
-          )
-        ) {
-          console.log(`Retry attempt ${attempt}...`);
-          await new Promise(r => setTimeout(r, 1000 * attempt));
-          continue;
+          max_tokens: Number(config.maxTokens ?? 4096)
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: 60000
         }
+      );
 
-        throw err;
+      const content = response.data.choices?.[0]?.message?.content ?? '';
+
+      if (options.useSession !== false && content) {
+        saveToSession(prompt, content);
+      }
+
+      return content;
+    } catch (err) {
+      lastError = err;
+      console.log(`Attempt ${attempt} failed:`, err.message);
+      
+      if (err.response) {
+        console.log('Status:', err.response.status);
+        console.log('Data:', JSON.stringify(err.response.data, null, 2));
+      }
+      
+      if (attempt < 3) {
+        console.log(`Retrying in ${attempt * 2} seconds...`);
+        await new Promise(r => setTimeout(r, 2000 * attempt));
       }
     }
-
-    if (!response) {
-      throw lastError || new Error('No response after retries');
-    }
-
-    const content = response.choices?.[0]?.message?.content ?? '';
-
-    // Save to session
-    if (options.useSession !== false && content) {
-      saveToSession(prompt, content);
-    }
-
-    return content;
-
-  } catch (error) {
-    console.error('Groq Error:', error);
-
-    if (error.status) {
-      console.error('Status:', error.status);
-    }
-
-    if (error.response) {
-      console.error(error.response);
-    }
-
-    throw new Error(error.message || 'Unknown AI Error');
   }
+
+  throw lastError || new Error('All attempts failed');
 }
 
 export function getSession() {
