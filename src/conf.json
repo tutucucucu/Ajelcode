@@ -1,0 +1,4 @@
+{
+  "prefix": true,
+  "model": "groq/llama3-70b-8192"
+}
