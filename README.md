@@ -1,4 +1,3 @@
-```markdown
 <p align="center">
   <img src="https://files.catbox.moe/0m18ey.jpg" alt="AjelCode Banner" width="800">
 </p>
@@ -55,7 +54,7 @@
 ### Prerequisites
 
 | Requirement | Version |
-|-------------|---------|
+|--------------|---------|
 | **Node.js** | v18 or higher |
 | **npm** | Latest |
 | **Groq API Key** | Get from [Groq Console](https://console.groq.com) |
@@ -66,7 +65,7 @@
 npm install -g ajelcode
 ```
 
-Install from Source
+### Install from Source
 
 ```bash
 git clone https://github.com/tutucucucu/ajelcode.git
@@ -77,9 +76,9 @@ npm link
 
 ---
 
-🚀 Quick Start
+## 🚀 Quick Start
 
-Basic Usage
+### Basic Usage
 
 ```bash
 # Generate a single file
@@ -95,10 +94,10 @@ ajelcode "make a React component with Button.jsx and styles.css"
 ajelcode -f instructions.txt
 ```
 
-First Time Setup
+### First Time Setup
 
-1. Get your Groq API Key from console.groq.com
-2. Create conf.json in your project root:
+1. Get your Groq API Key from [console.groq.com](https://console.groq.com)
+2. Create `conf.json` in your project root:
 
 ```json
 {
@@ -116,11 +115,11 @@ ajelcode "create index.html with a landing page"
 
 ---
 
-⚙️ Configuration
+## ⚙️ Configuration
 
-Config File Options
+### Config File Options
 
-Create conf.json in your project root or ~/.ajelcode/:
+Create `conf.json` in your project root or `~/.ajelcode/`:
 
 ```json
 {
@@ -133,30 +132,32 @@ Create conf.json in your project root or ~/.ajelcode/:
 }
 ```
 
-Configuration Reference
+### Configuration Reference
 
-Option Type Description Default
-model string Groq model to use llama-3.3-70b-versatile
-apiKey string Your Groq API key Required
-temperature number Randomness (0-1) 0.1
-maxTokens number Max response length 4096
-colors boolean Enable colored output true
-prefix boolean Enable command prefix true
+| Option | Type | Description | Default |
+|--------|------|--------------|---------|
+| `model` | string | Groq model to use | `llama-3.3-70b-versatile` |
+| `apiKey` | string | Your Groq API key | Required |
+| `temperature` | number | Randomness (0-1) | `0.1` |
+| `maxTokens` | number | Max response length | `4096` |
+| `colors` | boolean | Enable colored output | `true` |
+| `prefix` | boolean | Enable command prefix | `true` |
 
-Available Models
+### Available Models
 
-Model Speed Quality Best For
-llama-3.3-70b-versatile ⚡⚡⚡ ⭐⭐⭐⭐⭐ General purpose, high quality
-llama-3.2-90b-vision-preview ⚡⚡ ⭐⭐⭐⭐⭐ Complex tasks, largest model
-llama-3.2-11b-vision-preview ⚡⚡⚡⚡ ⭐⭐⭐⭐ Fast, good balance
-mixtral-8x7b-32768 ⚡⚡⚡ ⭐⭐⭐⭐ Long context tasks
-gemma2-9b-it ⚡⚡⚡⚡ ⭐⭐⭐ Google's model, stable
+| Model | Speed | Quality | Best For |
+|-------|-------|---------|----------|
+| `llama-3.3-70b-versatile` | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | General purpose, high quality |
+| `llama-3.2-90b-vision-preview` | ⚡⚡ | ⭐⭐⭐⭐⭐ | Complex tasks, largest model |
+| `llama-3.2-11b-vision-preview` | ⚡⚡⚡⚡ | ⭐⭐⭐⭐ | Fast, good balance |
+| `mixtral-8x7b-32768` | ⚡⚡⚡ | ⭐⭐⭐⭐ | Long context tasks |
+| `gemma2-9b-it` | ⚡⚡⚡⚡ | ⭐⭐⭐ | Google's model, stable |
 
 ---
 
-📚 Usage Examples
+## 📚 Usage Examples
 
-Example 1: Create a JavaScript Utility
+### Example 1: Create a JavaScript Utility
 
 ```bash
 ajelcode "create math.js with add, subtract, multiply, and divide functions"
@@ -173,7 +174,7 @@ function divide(a, b) { return a / b; }
 module.exports = { add, subtract, multiply, divide };
 ```
 
-Example 2: Build a Full Stack Application
+### Example 2: Build a Full Stack Application
 
 ```bash
 ajelcode "create a MERN stack app with server.js, models/User.js, routes/api.js"
@@ -197,19 +198,19 @@ const router = require('express').Router();
 // ... API routes
 ```
 
-Example 3: Generate HTML + CSS
+### Example 3: Generate HTML + CSS
 
 ```bash
 ajelcode "create a landing page with index.html and styles.css"
 ```
 
-Example 4: Python Data Script
+### Example 4: Python Data Script
 
 ```bash
 ajelcode "make data_analyzer.py that reads CSV and plots graphs"
 ```
 
-Example 5: Multi-File React Component
+### Example 5: Multi-File React Component
 
 ```bash
 ajelcode "create React component Button.jsx with Button.css and index.js"
@@ -217,9 +218,9 @@ ajelcode "create React component Button.jsx with Button.css and index.js"
 
 ---
 
-🎯 Advanced Usage
+## 🎯 Advanced Usage
 
-Custom Models
+### Custom Models
 
 ```bash
 # Use a specific model
@@ -229,7 +230,7 @@ ajelcode -m mixtral-8x7b-32768 "create a sorting algorithm"
 ajelcode -m llama-3.2-11b-vision-preview "build a weather app"
 ```
 
-Prompt from File
+### Prompt from File
 
 ```bash
 # Write instructions in a file
@@ -237,27 +238,29 @@ echo "Create a full-stack MERN application" > instructions.txt
 ajelcode -f instructions.txt
 ```
 
-Global vs Local Config
+### Global vs Local Config
 
 AjelCode loads config in this order:
 
-Priority Location Description
-1️⃣ ./conf.json Project-specific configuration
-2️⃣ ~/.ajelcode/conf.json Global configuration
-3️⃣ Default settings Built-in fallback values
+| Priority | Location | Description |
+|----------|----------|--------------|
+| 1️⃣ | `./conf.json` | Project-specific configuration |
+| 2️⃣ | `~/.ajelcode/conf.json` | Global configuration |
+| 3️⃣ | Default settings | Built-in fallback values |
 
-Command Line Options
+### Command Line Options
 
-Option Description Example
--f, --file <path> Read prompt from file ajelcode -f prompt.txt
--m, --model <model> Set AI model ajelcode -m gemma2-9b-it "test"
---no-color Disable colored output ajelcode --no-color "test"
--h, --help Show help ajelcode -h
--V, --version Show version ajelcode -V
+| Option | Description | Example |
+|--------|--------------|---------|
+| `-f, --file <path>` | Read prompt from file | `ajelcode -f prompt.txt` |
+| `-m, --model <model>` | Set AI model | `ajelcode -m gemma2-9b-it "test"` |
+| `--no-color` | Disable colored output | `ajelcode --no-color "test"` |
+| `-h, --help` | Show help | `ajelcode -h` |
+| `-V, --version` | Show version | `ajelcode -V` |
 
 ---
 
-📁 Project Structure
+## 📁 Project Structure
 
 ```
 ajelcode/
@@ -276,28 +279,28 @@ ajelcode/
 
 ---
 
-📊 Performance Comparison
+## 📊 Performance Comparison
 
-Model Speed Quality Latency Use Case
-llama-3.3-70b ⚡⚡⚡ ⭐⭐⭐⭐⭐ ~500ms Production code
-llama-3.2-11b ⚡⚡⚡⚡ ⭐⭐⭐⭐ ~200ms Fast prototyping
-mixtral-8x7b ⚡⚡⚡ ⭐⭐⭐⭐ ~400ms Long documents
-gemma2-9b ⚡⚡⚡⚡ ⭐⭐⭐ ~150ms Simple tasks
+| Model | Speed | Quality | Latency | Use Case |
+|-------|-------|---------|---------|----------|
+| `llama-3.3-70b` | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | ~500ms | Production code |
+| `llama-3.2-11b` | ⚡⚡⚡⚡ | ⭐⭐⭐⭐ | ~200ms | Fast prototyping |
+| `mixtral-8x7b` | ⚡⚡⚡ | ⭐⭐⭐⭐ | ~400ms | Long documents |
+| `gemma2-9b` | ⚡⚡⚡⚡ | ⭐⭐⭐ | ~150ms | Simple tasks |
 
 ---
 
-🐛 Troubleshooting
+## 🐛 Troubleshooting
 
-Common Issues
+| Issue | Solution |
+|-------|----------|
+| "Invalid API Key" | Regenerate your key at Groq Console and update `conf.json` |
+| "Model decommissioned" | Check available models and update `conf.json` |
+| "Command not found" | Reinstall globally: `npm uninstall -g ajelcode && npm install -g ajelcode` |
+| "Permission denied" | Fix permissions: `chmod +x bin/ajelcode.js && npm link` |
+| "No such file" | Ensure you're in the correct directory with `conf.json` |
 
-Issue Solution
-"Invalid API Key" Regenerate your key at Groq Console and update conf.json
-"Model decommissioned" Check available models and update conf.json
-"Command not found" Reinstall globally: npm uninstall -g ajelcode && npm install -g ajelcode
-"Permission denied" Fix permissions: chmod +x bin/ajelcode.js && npm link
-"No such file" Ensure you're in the correct directory with conf.json
-
-Debug Mode
+### Debug Mode
 
 ```bash
 # Run with verbose output
@@ -309,16 +312,17 @@ node -e "import('./src/config.js').then(m => console.log(m.loadConfig()))"
 
 ---
 
-🤝 Contributing
+## 🤝 Contributing
 
-Step Action
-1️⃣ Fork the repository
-2️⃣ Create your feature branch: git checkout -b feature/AmazingFeature
-3️⃣ Commit your changes: git commit -m 'Add some AmazingFeature'
-4️⃣ Push to the branch: git push origin feature/AmazingFeature
-5️⃣ Open a Pull Request
+| Step | Action |
+|------|--------|
+| 1️⃣ | Fork the repository |
+| 2️⃣ | Create your feature branch: `git checkout -b feature/AmazingFeature` |
+| 3️⃣ | Commit your changes: `git commit -m 'Add some AmazingFeature'` |
+| 4️⃣ | Push to the branch: `git push origin feature/AmazingFeature` |
+| 5️⃣ | Open a Pull Request |
 
-Development Setup
+### Development Setup
 
 ```bash
 # Clone your fork
@@ -337,7 +341,7 @@ ajelcode "test"
 
 ---
 
-📝 License
+## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
@@ -353,21 +357,22 @@ in the Software without restriction...
 
 ---
 
-🙏 Acknowledgments
+## 🙏 Acknowledgments
 
-Tool/Library Purpose
-Groq Incredibly fast inference
-OpenAI SDK API client
-Commander.js CLI parsing
-Chalk Terminal colors
+| Tool/Library | Purpose |
+|---------------|---------|
+| Groq | Incredibly fast inference |
+| OpenAI SDK | API client |
+| Commander.js | CLI parsing |
+| Chalk | Terminal colors |
 
 ---
 
-📞 Support & Community
+## 📞 Support & Community
 
-· 🐛 Report issues: GitHub Issues
-· ⭐ Star the repo: Show your support
-· 🔔 Follow for updates: Stay tuned for new features
+- 🐛 Report issues: GitHub Issues
+- ⭐ Star the repo: Show your support
+- 🔔 Follow for updates: Stay tuned for new features
 
 ---
 
@@ -382,4 +387,3 @@ ajelcode "make something amazing"
 Happy Coding! 🚀
 
 </div>
-```
