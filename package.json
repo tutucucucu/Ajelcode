@@ -1,6 +1,6 @@
 {
   "name": "ajelcode",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered CLI coding assistant with session management and API key support",
   "type": "module",
   "bin": {
@@ -11,7 +11,11 @@
     "test": "node bin/ajelcode.js test"
   },
   "keywords": ["cli", "ai", "coding-assistant", "groq", "code-generator", "terminal", "session"],
-  "author": "Ajel",
+  "author": {
+    "name": "azazelmahgituu",
+    "email": "azazelmahgituu@example.com",
+    "url": "https://github.com/tutucucucu"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
