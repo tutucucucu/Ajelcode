@@ -12,8 +12,10 @@ import ora from 'ora';
 initConfig();
 const config = loadConfig();
 
+// ASCII Banner
 console.log(chalk.cyan(figlet.textSync('AjelCode', { font: 'Standard' })));
 
+// Whale Song Animation
 const whaleSong = `
   ~♪~  ♪~♪  ~♪~  ♪~♪
    \\\\  /  \\\\  /  \\\\  /
@@ -28,6 +30,7 @@ program
   .description('AI Coding Assistant with Session Management')
   .version('1.0.0');
 
+// Main Interactive Menu
 program
   .command('start')
   .description('Start interactive session')
@@ -35,6 +38,7 @@ program
     await interactiveMenu();
   });
 
+// Chat Command
 program
   .command('chat [prompt]')
   .description('Chat with AI')
@@ -60,9 +64,13 @@ program
       console.log(chalk.green('\nDone.\n'));
     } catch (error) {
       spinner.fail('Error: ' + error.message);
+      if (error.stack) {
+        console.error(chalk.gray(error.stack));
+      }
     }
   });
 
+// Session Management
 program
   .command('session')
   .description('Manage chat sessions')
@@ -81,8 +89,8 @@ program
       console.log(chalk.cyan('\nSessions:\n'));
       if (sessions && sessions.length > 0) {
         sessions.forEach((s, i) => {
-          console.log(chalk.white(`${i + 1}. ${s.timestamp}`));
-          console.log(chalk.gray(`   ${s.prompt.substring(0, 50)}...`));
+          console.log(chalk.white(`${i + 1}. ${s.timestamp || 'No timestamp'}`));
+          console.log(chalk.gray(`   ${s.prompt ? s.prompt.substring(0, 50) : 'No prompt'}...`));
         });
       } else {
         console.log(chalk.yellow('No sessions found'));
@@ -91,17 +99,18 @@ program
     }
 
     const session = getSession();
-    if (session) {
+    if (session && session.length > 0) {
       console.log(chalk.cyan('\nCurrent Session:\n'));
       session.forEach((s, i) => {
-        console.log(chalk.white(`[${i + 1}] ${s.role}:`));
-        console.log(chalk.gray(`    ${s.content.substring(0, 100)}...`));
+        const role = s.role === 'user' ? chalk.green('User:') : chalk.blue('AI:');
+        console.log(`${role} ${chalk.gray(s.content ? s.content.substring(0, 150) + '...' : 'Empty')}`);
       });
     } else {
       console.log(chalk.yellow('No active session'));
     }
   });
 
+// Config Management
 program
   .command('config')
   .description('Manage configuration')
@@ -126,12 +135,14 @@ program
     if (options.list) {
       console.log(chalk.cyan('\nConfiguration:\n'));
       Object.entries(config).forEach(([key, value]) => {
-        console.log(chalk.white(`${key}:`), chalk.gray(value || 'Not set'));
+        const displayValue = key === 'apiKey' ? '********' : (value || 'Not set');
+        console.log(chalk.white(`${key}:`), chalk.gray(displayValue));
       });
       return;
     }
   });
 
+// API Key Management
 program
   .command('api')
   .description('Manage API keys')
@@ -139,6 +150,7 @@ program
     await manageAPIKeys();
   });
 
+// Default command (quick generate)
 program
   .argument('[prompt]', 'Your coding request')
   .option('-f, --file <path>', 'Read prompt from file')
@@ -169,15 +181,18 @@ program
       console.log(chalk.green('\nDone.\n'));
     } catch (error) {
       spinner.fail('Error: ' + error.message);
+      if (error.stack) {
+        console.error(chalk.gray(error.stack));
+      }
     }
   });
 
+// Interactive Menu Function
 async function interactiveMenu() {
   console.clear();
   console.log(chalk.cyan(figlet.textSync('AjelCode', { font: 'Standard' })));
   console.log(chalk.magenta('\n🐋 "The whale sings, the code flows..."\n'));
 
-  const session = getSession() || [];
   let running = true;
 
   while (running) {
@@ -222,6 +237,9 @@ async function interactiveMenu() {
           console.log(chalk.white(response));
         } catch (error) {
           spinner.fail('Error: ' + error.message);
+          if (error.stack) {
+            console.error(chalk.gray(error.stack));
+          }
         }
         break;
       }
@@ -246,6 +264,9 @@ async function interactiveMenu() {
           spinner.succeed('Files created successfully!');
         } catch (error) {
           spinner.fail('Error: ' + error.message);
+          if (error.stack) {
+            console.error(chalk.gray(error.stack));
+          }
         }
         break;
       }
@@ -255,8 +276,9 @@ async function interactiveMenu() {
         if (sessionData && sessionData.length > 0) {
           console.log(chalk.cyan('\nSession History:\n'));
           sessionData.forEach((s, i) => {
-            console.log(chalk.white(`[${i + 1}] ${s.role}:`));
-            console.log(chalk.gray(`    ${s.content.substring(0, 150)}...`));
+            const role = s.role === 'user' ? chalk.green('User:') : chalk.blue('AI:');
+            const content = s.content ? s.content.substring(0, 150) : 'Empty';
+            console.log(`${role} ${chalk.gray(content + (s.content && s.content.length > 150 ? '...' : ''))}`);
           });
         } else {
           console.log(chalk.yellow('No session data'));
@@ -279,6 +301,7 @@ async function interactiveMenu() {
             choices: [
               { name: `Model (${config.model})`, value: 'model' },
               { name: `Temperature (${config.temperature})`, value: 'temperature' },
+              { name: `Max Tokens (${config.maxTokens})`, value: 'maxTokens' },
               { name: 'Back', value: 'back' }
             ]
           }
@@ -314,5 +337,13 @@ async function interactiveMenu() {
     }
   }
 }
+
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error(chalk.red('Uncaught Exception:'), error.message);
+  if (error.stack) {
+    console.error(chalk.gray(error.stack));
+  }
+});
 
 program.parse();
