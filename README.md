@@ -1,28 +1,28 @@
 ```markdown
-# 🚀 AjelCode - AI-Powered Coding Assistant
+# AjelCode
 
-**AjelCode** is a CLI tool that generates code files from natural language prompts using Groq's high-speed AI models. Just describe what you want, and AjelCode creates the files for you.
+**AjelCode** is a CLI tool that converts natural language prompts into code files using Groq's high-speed AI models. Describe what you need, and AjelCode generates the files instantly.
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/ajelcode)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/tutucucucu/ajelcode)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Groq](https://img.shields.io/badge/powered%20by-Groq-orange.svg)](https://groq.com)
 
 ---
 
-## ✨ Features
+## Features
 
-- **Natural Language to Code** - Describe what you want in plain English
-- **Multi-File Generation** - Create entire project structures with one prompt
-- **Auto-Folder Creation** - Generates folders and nested files automatically
-- **Lightning Fast** - Powered by Groq's ultra-low latency inference
-- **Zero Config Required** - Just install and start coding
-- **Global CLI** - Use from any directory
-- **Customizable** - Configure models, temperature, and more
+- **Natural Language to Code** – Describe what you want in plain English
+- **Multi-File Generation** – Create entire project structures with a single prompt
+- **Auto-Folder Creation** – Generates folders and nested files automatically
+- **Blazing Fast** – Powered by Groq's ultra-low latency inference
+- **Zero Config Required** – Install and start coding immediately
+- **Global CLI** – Use from any directory on your system
+- **Fully Customizable** – Configure models, temperature, and more
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 - Node.js v18 or higher
@@ -37,7 +37,7 @@ npm install -g ajelcode
 Install from Source
 
 ```bash
-git clone https://github.com/yourusername/ajelcode.git
+git clone https://github.com/tutucucucu/ajelcode.git
 cd ajelcode
 npm install
 npm link
@@ -47,11 +47,11 @@ Get Your API Key
 
 1. Sign up at Groq Console
 2. Generate an API key
-3. Create conf.json (see configuration below)
+3. Create conf.json (see Configuration)
 
 ---
 
-🚀 Quick Start
+Quick Start
 
 Basic Usage
 
@@ -87,7 +87,7 @@ ajelcode "create server.js, routes.js, and models.js for an Express API"
 
 ---
 
-⚙️ Configuration
+Configuration
 
 Create conf.json in your project root or ~/.ajelcode/:
 
@@ -123,7 +123,7 @@ gemma2-9b-it Google's model, stable
 
 ---
 
-📁 Project Structure
+Project Structure
 
 ```
 ajelcode/
@@ -141,7 +141,7 @@ ajelcode/
 
 ---
 
-🎯 Advanced Usage
+Advanced Usage
 
 Custom Models
 
@@ -171,7 +171,7 @@ AjelCode loads config in this order:
 
 ---
 
-🛠️ Development
+Development
 
 Run in Development Mode
 
@@ -201,7 +201,7 @@ npm unlink -g ajelcode
 
 ---
 
-📊 Performance
+Performance
 
 Model Speed Quality Use Case
 llama-3.3-70b ⚡⚡⚡ ⭐⭐⭐⭐⭐ Production code
@@ -211,23 +211,23 @@ gemma2-9b ⚡⚡⚡⚡ ⭐⭐⭐ Simple tasks
 
 ---
 
-🐛 Troubleshooting
+Troubleshooting
 
-"Invalid API Key"
+Invalid API Key
 
 ```bash
 # Regenerate your key at Groq Console
 # Update conf.json or ~/.ajelcode/conf.json
 ```
 
-"Model decommissioned"
+Model Decommissioned
 
 ```bash
 # Check available models: https://console.groq.com/docs/models
 # Update the model field in conf.json
 ```
 
-Command not found
+Command Not Found
 
 ```bash
 # Reinstall globally
@@ -238,7 +238,7 @@ npm install -g ajelcode
 echo $PATH
 ```
 
-Permission denied
+Permission Denied
 
 ```bash
 # Fix permissions
@@ -248,7 +248,7 @@ npm link
 
 ---
 
-🤝 Contributing
+Contributing
 
 1. Fork the repository
 2. Create your feature branch (git checkout -b feature/AmazingFeature)
@@ -258,13 +258,13 @@ npm link
 
 ---
 
-📝 License
+License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
-🙏 Acknowledgments
+Acknowledgments
 
 · Groq for their incredibly fast inference
 · OpenAI SDK for the client
@@ -273,56 +273,16 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-📞 Support
+Support
 
 · Create an Issue
-· Star ⭐ the repository
+· Star the repository
 · Follow for updates
 
 ---
 
-Made with ❤️ for developers who want to code faster
+Made with care for developers who want to code faster.
 
 ```bash
 ajelcode "make something amazing"
-```
-
-```
-
----
-
-## Udah siap upload ke GitHub. Jangan lupa:
-
-### 1. Bikin repo di GitHub
-```bash
-git init
-git add .
-git commit -m "Initial commit: AjelCode v1.0.0"
-git remote add origin https://github.com/username/ajelcode.git
-git push -u origin main
-```
-
-2. Tambahin LICENSE
-
-```bash
-cat > LICENSE << 'EOF'
-MIT License
-
-Copyright (c) 2026 Ajel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy...
-EOF
-```
-
-3. .gitignore
-
-```bash
-cat > .gitignore << 'EOF'
-node_modules/
-*.log
-.env
-.DS_Store
-dist/
-*.tmp
-EOF
 ```
