@@ -14,7 +14,8 @@ export async function askAI(prompt, options = {}) {
   }
 
   const client = new Groq({
-    apiKey: apiKey
+    apiKey: apiKey,
+    timeout: 60000
   });
 
   const systemPrompt = `You are AjelCode, an AI coding assistant. Your ONLY job is to generate code files.
@@ -39,12 +40,6 @@ EXAMPLE OUTPUT:
 ### FILE: hello.js
 console.log('Hello Ajel');
 
-### FILE: index.html
-<!DOCTYPE html>
-<html>...</html>
-
-### FOLDER: src/utils
-
 Now generate code for the user's request.`;
 
   const model = options.model || config.model || 'llama-3.3-70b-versatile';
@@ -64,23 +59,71 @@ Now generate code for the user's request.`;
 
     messages.push({ role: 'user', content: prompt });
 
-    const response = await client.chat.completions.create({
-      model: model,
-      messages: messages,
-      temperature: parseFloat(config.temperature) || 0.1,
-      max_tokens: parseInt(config.maxTokens) || 4096,
-    });
+    // Batasi history agar request tidak terlalu besar
+    if (messages.length > 21) {
+      messages = [messages[0], ...messages.slice(-20)];
+    }
 
-    const content = response.choices[0].message.content;
+    let response;
+    let lastError;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        response = await client.chat.completions.create({
+          model: model,
+          messages: messages,
+          temperature: Number(config.temperature ?? 0.1),
+          max_completion_tokens: Number(config.maxTokens ?? 4096),
+          stream: false,
+        });
+        break;
+      } catch (err) {
+        lastError = err;
+
+        // Retry jika koneksi terputus
+        if (
+          attempt < 3 &&
+          (
+            err.message?.includes('Premature close') ||
+            err.message?.includes('ECONNRESET') ||
+            err.message?.includes('fetch failed') ||
+            err.message?.includes('socket hang up')
+          )
+        ) {
+          console.log(`Retry attempt ${attempt}...`);
+          await new Promise(r => setTimeout(r, 1000 * attempt));
+          continue;
+        }
+
+        throw err;
+      }
+    }
+
+    if (!response) {
+      throw lastError || new Error('No response after retries');
+    }
+
+    const content = response.choices?.[0]?.message?.content ?? '';
 
     // Save to session
-    if (options.useSession !== false) {
+    if (options.useSession !== false && content) {
       saveToSession(prompt, content);
     }
 
     return content;
+
   } catch (error) {
-    throw new Error('AI Error: ' + error.message);
+    console.error('Groq Error:', error);
+
+    if (error.status) {
+      console.error('Status:', error.status);
+    }
+
+    if (error.response) {
+      console.error(error.response);
+    }
+
+    throw new Error(error.message || 'Unknown AI Error');
   }
 }
 
@@ -108,9 +151,9 @@ export function saveToSession(prompt, response) {
       { role: 'assistant', content: response }
     );
     
-    // Keep last 50 messages to avoid overflow
-    if (session.messages.length > 50) {
-      session.messages = session.messages.slice(-50);
+    // Simpan maksimal 10 percakapan (20 pesan)
+    if (session.messages.length > 20) {
+      session.messages = session.messages.slice(-20);
     }
     
     session.timestamp = new Date().toISOString();
