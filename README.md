@@ -31,7 +31,6 @@
 - [Project Structure](#-project-structure)
 - [Session Management](#-session-management)
 - [Troubleshooting](#-troubleshooting)
-- [Publishing](#-publishing)
 - [License](#-license)
 - [Author](#-author)
 
@@ -70,6 +69,26 @@ npm link
 ---
 
 ## 🚀 Quick Start
+
+```bash
+git clone https://github.com/tutucucucu/ajelcode.git
+cd ajelcode
+npm install
+```
+
+### Termux Setup
+
+Kalau lo pakai Termux, jalankan script ini biar `ajelcode` bisa dipanggil global:
+
+```bash
+#!/bin/bash
+chmod +x bin/ajelcode.js 2>/dev/null
+npm link 2>/dev/null
+chmod +x /data/data/com.termux/files/usr/bin/ajelcode 2>/dev/null
+ajelcode "$@"
+```
+
+### Basic Usage
 
 ```bash
 # Start interactive session (recommended)
@@ -251,27 +270,6 @@ ajelcode session -c
 | Model not found | Update config with an available model |
 | Command not found | Reinstall: `npm install -g ajelcode` |
 | Session not saving | Check write permissions in current directory |
-
----
-
-## 🚢 Publishing
-
-```bash
-# Login pake username npm lo
-npm login
-# Username: azazelmahgituu
-# Password: password npm lo
-# Email: email terdaftar
-
-# Publish
-npm publish --access=public
-```
-
-Setelah publish, package bisa diinstall:
-
-```bash
-npm install -g ajelcode
-```
 
 ---
 
