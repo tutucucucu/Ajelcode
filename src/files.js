@@ -1,5 +1,5 @@
-import { writeFileSync, mkdirSync } from 'fs';
-import { dirname } from 'path';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { dirname, join } from 'path';
 import chalk from 'chalk';
 
 export async function handleFileOperation(aiResponse) {
