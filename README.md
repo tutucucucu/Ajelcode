@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>AI-Powered CLI Coding Assistant</strong><br>
-  Turn natural language into code files instantly with Groq
+  Turn natural language into code files instantly with Groq — now with sessions, API key management, and an interactive menu
 </p>
 
 <p align="center">
@@ -23,14 +23,17 @@
 - [Features](#-features)
 - [Installation](#-installation)
 - [Quick Start](#-quick-start)
+- [Commands](#-commands)
 - [Configuration](#-configuration)
+- [API Key Management](#-api-key-management)
+- [Available Models](#-available-models)
 - [Usage Examples](#-usage-examples)
-- [Advanced Usage](#-advanced-usage)
 - [Project Structure](#-project-structure)
-- [Performance](#-performance)
+- [Session Management](#-session-management)
 - [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
+- [Publishing](#-publishing)
 - [License](#-license)
+- [Author](#-author)
 
 ---
 
@@ -38,28 +41,18 @@
 
 | Feature | Description |
 |---------|-------------|
+| 🖥️ **Interactive Menu** | Full TUI with arrow-key navigation |
+| 💬 **Session Management** | Chat history saved automatically |
+| 🔑 **API Key Manager** | Generate, check, and delete API keys |
 | 🗣️ **Natural Language to Code** | Describe what you want in plain English |
 | 📁 **Multi-File Generation** | Create entire project structures with one prompt |
-| 📂 **Auto-Folder Creation** | Generates folders and nested files automatically |
 | ⚡ **Blazing Fast** | Powered by Groq's ultra-low latency inference |
-| 🔧 **Zero Config Required** | Install and start coding immediately |
 | 🌍 **Global CLI** | Use from any directory on your system |
 | 🎨 **Customizable** | Configure models, temperature, and more |
-| 🎯 **File-Based Prompts** | Load instructions from `.txt` files |
 
 ---
 
 ## 📦 Installation
-
-### Prerequisites
-
-| Requirement | Version |
-|--------------|---------|
-| **Node.js** | v18 or higher |
-| **npm** | Latest |
-| **Groq API Key** | Get from [Groq Console](https://console.groq.com) |
-
-### Install Globally
 
 ```bash
 npm install -g ajelcode
@@ -78,169 +71,54 @@ npm link
 
 ## 🚀 Quick Start
 
-### Basic Usage
-
 ```bash
-# Generate a single file
+# Start interactive session (recommended)
+ajelcode start
+
+# Generate code from prompt
 ajelcode "create hello.js with console.log('Hello World')"
 
-# Generate multiple files
-ajelcode "build a REST API with Express, create server.js and routes.js"
+# Chat with AI
+ajelcode chat "how to sort array in javascript"
 
-# Create a full project
-ajelcode "make a React component with Button.jsx and styles.css"
-
-# Read prompt from file
+# Generate from file
 ajelcode -f instructions.txt
 ```
 
-### First Time Setup
+---
 
-1. Get your Groq API Key from [console.groq.com](https://console.groq.com)
-2. Create `conf.json` in your project root:
+## 🎛️ Commands
 
-```json
-{
-  "model": "llama-3.3-70b-versatile",
-  "apiKey": "your-groq-api-key-here",
-  "temperature": 0.1
-}
-```
-
-3. Run your first command:
-
-```bash
-ajelcode "create index.html with a landing page"
-```
+| Command | Description |
+|---------|--------------|
+| `ajelcode start` | Start interactive session with menu |
+| `ajelcode chat "prompt"` | Chat with AI (session saved) |
+| `ajelcode "prompt"` | Generate code directly |
+| `ajelcode -f file.txt` | Read prompt from file |
+| `ajelcode session -l` | List all sessions |
+| `ajelcode session -c` | Clear current session |
+| `ajelcode session -s` | Show current session |
+| `ajelcode config -l` | Show configuration |
+| `ajelcode config -s key value` | Set config value |
+| `ajelcode api` | Manage API keys |
 
 ---
 
 ## ⚙️ Configuration
 
-### Config File Options
-
 Create `conf.json` in your project root or `~/.ajelcode/`:
 
 ```json
 {
-  "prefix": true,
   "model": "llama-3.3-70b-versatile",
-  "apiKey": "your-groq-api-key-here",
+  "apiKey": "your-groq-api-key",
   "temperature": 0.1,
   "maxTokens": 4096,
   "colors": true
 }
 ```
 
-### Configuration Reference
-
-| Option | Type | Description | Default |
-|--------|------|--------------|---------|
-| `model` | string | Groq model to use | `llama-3.3-70b-versatile` |
-| `apiKey` | string | Your Groq API key | Required |
-| `temperature` | number | Randomness (0-1) | `0.1` |
-| `maxTokens` | number | Max response length | `4096` |
-| `colors` | boolean | Enable colored output | `true` |
-| `prefix` | boolean | Enable command prefix | `true` |
-
-### Available Models
-
-| Model | Speed | Quality | Best For |
-|-------|-------|---------|----------|
-| `llama-3.3-70b-versatile` | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | General purpose, high quality |
-| `llama-3.2-90b-vision-preview` | ⚡⚡ | ⭐⭐⭐⭐⭐ | Complex tasks, largest model |
-| `llama-3.2-11b-vision-preview` | ⚡⚡⚡⚡ | ⭐⭐⭐⭐ | Fast, good balance |
-| `mixtral-8x7b-32768` | ⚡⚡⚡ | ⭐⭐⭐⭐ | Long context tasks |
-| `gemma2-9b-it` | ⚡⚡⚡⚡ | ⭐⭐⭐ | Google's model, stable |
-
----
-
-## 📚 Usage Examples
-
-### Example 1: Create a JavaScript Utility
-
-```bash
-ajelcode "create math.js with add, subtract, multiply, and divide functions"
-```
-
-Output:
-
-```
-### FILE: math.js
-function add(a, b) { return a + b; }
-function subtract(a, b) { return a - b; }
-function multiply(a, b) { return a * b; }
-function divide(a, b) { return a / b; }
-module.exports = { add, subtract, multiply, divide };
-```
-
-### Example 2: Build a Full Stack Application
-
-```bash
-ajelcode "create a MERN stack app with server.js, models/User.js, routes/api.js"
-```
-
-Output:
-
-```
-### FILE: server.js
-const express = require('express');
-const app = express();
-// ... full server code
-
-### FOLDER: models
-### FILE: models/User.js
-const mongoose = require('mongoose');
-// ... User schema
-
-### FILE: routes/api.js
-const router = require('express').Router();
-// ... API routes
-```
-
-### Example 3: Generate HTML + CSS
-
-```bash
-ajelcode "create a landing page with index.html and styles.css"
-```
-
-### Example 4: Python Data Script
-
-```bash
-ajelcode "make data_analyzer.py that reads CSV and plots graphs"
-```
-
-### Example 5: Multi-File React Component
-
-```bash
-ajelcode "create React component Button.jsx with Button.css and index.js"
-```
-
----
-
-## 🎯 Advanced Usage
-
-### Custom Models
-
-```bash
-# Use a specific model
-ajelcode -m mixtral-8x7b-32768 "create a sorting algorithm"
-
-# Override via command line
-ajelcode -m llama-3.2-11b-vision-preview "build a weather app"
-```
-
-### Prompt from File
-
-```bash
-# Write instructions in a file
-echo "Create a full-stack MERN application" > instructions.txt
-ajelcode -f instructions.txt
-```
-
-### Global vs Local Config
-
-AjelCode loads config in this order:
+### Config Priority
 
 | Priority | Location | Description |
 |----------|----------|--------------|
@@ -248,15 +126,78 @@ AjelCode loads config in this order:
 | 2️⃣ | `~/.ajelcode/conf.json` | Global configuration |
 | 3️⃣ | Default settings | Built-in fallback values |
 
-### Command Line Options
+---
 
-| Option | Description | Example |
-|--------|--------------|---------|
-| `-f, --file <path>` | Read prompt from file | `ajelcode -f prompt.txt` |
-| `-m, --model <model>` | Set AI model | `ajelcode -m gemma2-9b-it "test"` |
-| `--no-color` | Disable colored output | `ajelcode --no-color "test"` |
-| `-h, --help` | Show help | `ajelcode -h` |
-| `-V, --version` | Show version | `ajelcode -V` |
+## 🔑 API Key Management
+
+```bash
+ajelcode api
+```
+
+Menu options:
+
+- Generate New API Key
+- Check API Key
+- Delete API Key
+- Get Browser Token
+
+### Manual API Key Generation
+
+```bash
+curl -X POST https://api-keys.catpuffcake.workers.dev/api/apikeys/new \
+  -H "Content-Type: application/json" \
+  -H "X-SECRET: Ajajelimups" \
+  -d '{"name":"My API Key"}'
+```
+
+Response:
+
+```json
+{
+  "success": true,
+  "apiKey": "ajel_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+}
+```
+
+---
+
+## 🧠 Available Models
+
+| Model | Speed | Quality | Best For |
+|-------|-------|---------|----------|
+| `llama-3.3-70b-versatile` | Medium | Best | Production code |
+| `llama-3.2-90b-vision-preview` | Slow | Best | Complex tasks |
+| `llama-3.2-11b-vision-preview` | Fast | Good | Prototyping |
+| `mixtral-8x7b-32768` | Medium | Good | Long context |
+| `gemma2-9b-it` | Fast | Medium | Simple tasks |
+
+---
+
+## 📚 Usage Examples
+
+### Generate a JavaScript Module
+
+```bash
+ajelcode "create math.js with add, subtract, multiply, divide functions"
+```
+
+### Build a Full Stack App
+
+```bash
+ajelcode "create Express API with server.js, routes/api.js, models/User.js"
+```
+
+### Create a React Component
+
+```bash
+ajelcode "make Button.jsx with Button.css and index.js"
+```
+
+### Generate a Python Script
+
+```bash
+ajelcode "create data_analyzer.py that reads CSV and plots graphs"
+```
 
 ---
 
@@ -264,29 +205,41 @@ AjelCode loads config in this order:
 
 ```
 ajelcode/
-├── 📁 bin/
-│   └── 📄 ajelcode.js        # Entry point
-├── 📁 src/
-│   ├── 📄 cli.js             # CLI handler
-│   ├── 📄 ai.js              # Groq integration
-│   ├── 📄 files.js           # File operations
-│   └── 📄 config.js          # Config loader
-├── 📄 conf.json              # Configuration
-├── 📄 package.json
-├── 📄 README.md
-└── 📄 LICENSE
+├── bin/
+│   └── ajelcode.js        # Entry point
+├── src/
+│   ├── cli.js             # CLI handler with menu
+│   ├── ai.js              # Groq integration + session
+│   ├── files.js           # File operations
+│   ├── config.js          # Config loader
+│   └── api-keys.js        # API key management
+├── conf.json              # Configuration
+├── package.json
+└── README.md
 ```
 
 ---
 
-## 📊 Performance Comparison
+## 💾 Session Management
 
-| Model | Speed | Quality | Latency | Use Case |
-|-------|-------|---------|---------|----------|
-| `llama-3.3-70b` | ⚡⚡⚡ | ⭐⭐⭐⭐⭐ | ~500ms | Production code |
-| `llama-3.2-11b` | ⚡⚡⚡⚡ | ⭐⭐⭐⭐ | ~200ms | Fast prototyping |
-| `mixtral-8x7b` | ⚡⚡⚡ | ⭐⭐⭐⭐ | ~400ms | Long documents |
-| `gemma2-9b` | ⚡⚡⚡⚡ | ⭐⭐⭐ | ~150ms | Simple tasks |
+Sessions are stored in `.ajelcode_session.json` in the current directory.
+
+- Chat history preserved across commands
+- Last 50 messages kept
+- Sessions persist until cleared
+
+### Session Commands
+
+```bash
+# View current session
+ajelcode session -s
+
+# List all sessions
+ajelcode session -l
+
+# Clear session
+ajelcode session -c
+```
 
 ---
 
@@ -294,85 +247,46 @@ ajelcode/
 
 | Issue | Solution |
 |-------|----------|
-| "Invalid API Key" | Regenerate your key at Groq Console and update `conf.json` |
-| "Model decommissioned" | Check available models and update `conf.json` |
-| "Command not found" | Reinstall globally: `npm uninstall -g ajelcode && npm install -g ajelcode` |
-| "Permission denied" | Fix permissions: `chmod +x bin/ajelcode.js && npm link` |
-| "No such file" | Ensure you're in the correct directory with `conf.json` |
-
-### Debug Mode
-
-```bash
-# Run with verbose output
-node bin/ajelcode.js "test" --debug
-
-# Check config loading
-node -e "import('./src/config.js').then(m => console.log(m.loadConfig()))"
-```
+| Invalid API Key | Run `ajelcode api` to generate/check key |
+| Model not found | Update config with an available model |
+| Command not found | Reinstall: `npm install -g ajelcode` |
+| Session not saving | Check write permissions in current directory |
 
 ---
 
-## 🤝 Contributing
-
-| Step | Action |
-|------|--------|
-| 1️⃣ | Fork the repository |
-| 2️⃣ | Create your feature branch: `git checkout -b feature/AmazingFeature` |
-| 3️⃣ | Commit your changes: `git commit -m 'Add some AmazingFeature'` |
-| 4️⃣ | Push to the branch: `git push origin feature/AmazingFeature` |
-| 5️⃣ | Open a Pull Request |
-
-### Development Setup
+## 🚢 Publishing
 
 ```bash
-# Clone your fork
-git clone https://github.com/yourusername/ajelcode.git
-cd ajelcode
+# Login pake username npm lo
+npm login
+# Username: azazelmahgituu
+# Password: password npm lo
+# Email: email terdaftar
 
-# Install dependencies
-npm install
+# Publish
+npm publish --access=public
+```
 
-# Link globally for testing
-npm link
+Setelah publish, package bisa diinstall:
 
-# Run tests
-ajelcode "test"
+```bash
+npm install -g ajelcode
 ```
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-```
-MIT License
-
-Copyright (c) 2026 Ajel
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
-```
+MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## 👤 Author
 
-| Tool/Library | Purpose |
-|---------------|---------|
-| Groq | Incredibly fast inference |
-| OpenAI SDK | API client |
-| Commander.js | CLI parsing |
-| Chalk | Terminal colors |
+**azazelmahgituu**
 
----
-
-## 📞 Support & Community
-
-- 🐛 Report issues: GitHub Issues
-- ⭐ Star the repo: Show your support
-- 🔔 Follow for updates: Stay tuned for new features
+- GitHub: [github.com/tutucucucu](https://github.com/tutucucucu)
+- npm: [ajelcode](https://www.npmjs.com/package/ajelcode)
 
 ---
 
