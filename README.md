@@ -1,32 +1,64 @@
 ```markdown
-# AjelCode
+<p align="center">
+  <img src="https://files.catbox.moe/0m18ey.jpg" alt="AjelCode Banner" width="800">
+</p>
 
-**AjelCode** is a CLI tool that converts natural language prompts into code files using Groq's high-speed AI models. Describe what you need, and AjelCode generates the files instantly.
+<h1 align="center">⚡ AjelCode</h1>
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/tutucucucu/ajelcode)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Groq](https://img.shields.io/badge/powered%20by-Groq-orange.svg)](https://groq.com)
+<p align="center">
+  <strong>AI-Powered CLI Coding Assistant</strong><br>
+  Turn natural language into code files instantly with Groq
+</p>
 
----
-
-## Features
-
-- **Natural Language to Code** – Describe what you want in plain English
-- **Multi-File Generation** – Create entire project structures with a single prompt
-- **Auto-Folder Creation** – Generates folders and nested files automatically
-- **Blazing Fast** – Powered by Groq's ultra-low latency inference
-- **Zero Config Required** – Install and start coding immediately
-- **Global CLI** – Use from any directory on your system
-- **Fully Customizable** – Configure models, temperature, and more
+<p align="center">
+  <a href="#"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg?style=for-the-badge" alt="Version"></a>
+  <a href="#"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg?style=for-the-badge" alt="Node.js"></a>
+  <a href="#"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge" alt="License"></a>
+  <a href="#"><img src="https://img.shields.io/badge/powered%20by-Groq-orange.svg?style=for-the-badge" alt="Groq"></a>
+</p>
 
 ---
 
-## Installation
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Installation](#-installation)
+- [Quick Start](#-quick-start)
+- [Configuration](#-configuration)
+- [Usage Examples](#-usage-examples)
+- [Advanced Usage](#-advanced-usage)
+- [Project Structure](#-project-structure)
+- [Performance](#-performance)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---------|-------------|
+| 🗣️ **Natural Language to Code** | Describe what you want in plain English |
+| 📁 **Multi-File Generation** | Create entire project structures with one prompt |
+| 📂 **Auto-Folder Creation** | Generates folders and nested files automatically |
+| ⚡ **Blazing Fast** | Powered by Groq's ultra-low latency inference |
+| 🔧 **Zero Config Required** | Install and start coding immediately |
+| 🌍 **Global CLI** | Use from any directory on your system |
+| 🎨 **Customizable** | Configure models, temperature, and more |
+| 🎯 **File-Based Prompts** | Load instructions from `.txt` files |
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
-- Node.js v18 or higher
-- npm or yarn
+
+| Requirement | Version |
+|-------------|---------|
+| **Node.js** | v18 or higher |
+| **npm** | Latest |
+| **Groq API Key** | Get from [Groq Console](https://console.groq.com) |
 
 ### Install Globally
 
@@ -43,15 +75,9 @@ npm install
 npm link
 ```
 
-Get Your API Key
-
-1. Sign up at Groq Console
-2. Generate an API key
-3. Create conf.json (see Configuration)
-
 ---
 
-Quick Start
+🚀 Quick Start
 
 Basic Usage
 
@@ -69,25 +95,30 @@ ajelcode "make a React component with Button.jsx and styles.css"
 ajelcode -f instructions.txt
 ```
 
-Examples
+First Time Setup
+
+1. Get your Groq API Key from console.groq.com
+2. Create conf.json in your project root:
+
+```json
+{
+  "model": "llama-3.3-70b-versatile",
+  "apiKey": "your-groq-api-key-here",
+  "temperature": 0.1
+}
+```
+
+3. Run your first command:
 
 ```bash
-# Create an HTML page
-ajelcode "create index.html with a beautiful landing page"
-
-# Build a Node.js module
-ajelcode "create math.js with add, subtract, multiply, and divide functions"
-
-# Generate a Python script
-ajelcode "make data_analyzer.py that reads CSV and plots graphs"
-
-# Create multiple files at once
-ajelcode "create server.js, routes.js, and models.js for an Express API"
+ajelcode "create index.html with a landing page"
 ```
 
 ---
 
-Configuration
+⚙️ Configuration
+
+Config File Options
 
 Create conf.json in your project root or ~/.ajelcode/:
 
@@ -102,46 +133,91 @@ Create conf.json in your project root or ~/.ajelcode/:
 }
 ```
 
-Config Options
+Configuration Reference
 
-Option Description Default
-model Groq model to use llama-3.3-70b-versatile
-apiKey Your Groq API key Required
-temperature Randomness (0-1) 0.1
-maxTokens Max response length 4096
-colors Enable colored output true
-prefix Enable command prefix true
+Option Type Description Default
+model string Groq model to use llama-3.3-70b-versatile
+apiKey string Your Groq API key Required
+temperature number Randomness (0-1) 0.1
+maxTokens number Max response length 4096
+colors boolean Enable colored output true
+prefix boolean Enable command prefix true
 
 Available Models
 
-Model Best For
-llama-3.3-70b-versatile General purpose, high quality
-llama-3.2-90b-vision-preview Complex tasks, largest model
-llama-3.2-11b-vision-preview Fast, good balance
-mixtral-8x7b-32768 Long context tasks
-gemma2-9b-it Google's model, stable
+Model Speed Quality Best For
+llama-3.3-70b-versatile ⚡⚡⚡ ⭐⭐⭐⭐⭐ General purpose, high quality
+llama-3.2-90b-vision-preview ⚡⚡ ⭐⭐⭐⭐⭐ Complex tasks, largest model
+llama-3.2-11b-vision-preview ⚡⚡⚡⚡ ⭐⭐⭐⭐ Fast, good balance
+mixtral-8x7b-32768 ⚡⚡⚡ ⭐⭐⭐⭐ Long context tasks
+gemma2-9b-it ⚡⚡⚡⚡ ⭐⭐⭐ Google's model, stable
 
 ---
 
-Project Structure
+📚 Usage Examples
+
+Example 1: Create a JavaScript Utility
+
+```bash
+ajelcode "create math.js with add, subtract, multiply, and divide functions"
+```
+
+Output:
 
 ```
-ajelcode/
-├── bin/
-│   └── ajelcode.js        # Entry point
-├── src/
-│   ├── cli.js             # CLI handler
-│   ├── ai.js              # Groq integration
-│   ├── files.js           # File operations
-│   └── config.js          # Config loader
-├── conf.json              # Configuration
-├── package.json
-└── README.md
+### FILE: math.js
+function add(a, b) { return a + b; }
+function subtract(a, b) { return a - b; }
+function multiply(a, b) { return a * b; }
+function divide(a, b) { return a / b; }
+module.exports = { add, subtract, multiply, divide };
+```
+
+Example 2: Build a Full Stack Application
+
+```bash
+ajelcode "create a MERN stack app with server.js, models/User.js, routes/api.js"
+```
+
+Output:
+
+```
+### FILE: server.js
+const express = require('express');
+const app = express();
+// ... full server code
+
+### FOLDER: models
+### FILE: models/User.js
+const mongoose = require('mongoose');
+// ... User schema
+
+### FILE: routes/api.js
+const router = require('express').Router();
+// ... API routes
+```
+
+Example 3: Generate HTML + CSS
+
+```bash
+ajelcode "create a landing page with index.html and styles.css"
+```
+
+Example 4: Python Data Script
+
+```bash
+ajelcode "make data_analyzer.py that reads CSV and plots graphs"
+```
+
+Example 5: Multi-File React Component
+
+```bash
+ajelcode "create React component Button.jsx with Button.css and index.js"
 ```
 
 ---
 
-Advanced Usage
+🎯 Advanced Usage
 
 Custom Models
 
@@ -165,124 +241,145 @@ Global vs Local Config
 
 AjelCode loads config in this order:
 
-1. ./conf.json (project-specific)
-2. ~/.ajelcode/conf.json (global)
-3. Default settings
+Priority Location Description
+1️⃣ ./conf.json Project-specific configuration
+2️⃣ ~/.ajelcode/conf.json Global configuration
+3️⃣ Default settings Built-in fallback values
+
+Command Line Options
+
+Option Description Example
+-f, --file <path> Read prompt from file ajelcode -f prompt.txt
+-m, --model <model> Set AI model ajelcode -m gemma2-9b-it "test"
+--no-color Disable colored output ajelcode --no-color "test"
+-h, --help Show help ajelcode -h
+-V, --version Show version ajelcode -V
 
 ---
 
-Development
+📁 Project Structure
 
-Run in Development Mode
-
-```bash
-# Without global install
-node bin/ajelcode.js "your prompt"
-
-# With auto-reload (using nodemon)
-nodemon bin/ajelcode.js "your prompt"
+```
+ajelcode/
+├── 📁 bin/
+│   └── 📄 ajelcode.js        # Entry point
+├── 📁 src/
+│   ├── 📄 cli.js             # CLI handler
+│   ├── 📄 ai.js              # Groq integration
+│   ├── 📄 files.js           # File operations
+│   └── 📄 config.js          # Config loader
+├── 📄 conf.json              # Configuration
+├── 📄 package.json
+├── 📄 README.md
+└── 📄 LICENSE
 ```
 
-Build and Test
+---
+
+📊 Performance Comparison
+
+Model Speed Quality Latency Use Case
+llama-3.3-70b ⚡⚡⚡ ⭐⭐⭐⭐⭐ ~500ms Production code
+llama-3.2-11b ⚡⚡⚡⚡ ⭐⭐⭐⭐ ~200ms Fast prototyping
+mixtral-8x7b ⚡⚡⚡ ⭐⭐⭐⭐ ~400ms Long documents
+gemma2-9b ⚡⚡⚡⚡ ⭐⭐⭐ ~150ms Simple tasks
+
+---
+
+🐛 Troubleshooting
+
+Common Issues
+
+Issue Solution
+"Invalid API Key" Regenerate your key at Groq Console and update conf.json
+"Model decommissioned" Check available models and update conf.json
+"Command not found" Reinstall globally: npm uninstall -g ajelcode && npm install -g ajelcode
+"Permission denied" Fix permissions: chmod +x bin/ajelcode.js && npm link
+"No such file" Ensure you're in the correct directory with conf.json
+
+Debug Mode
 
 ```bash
+# Run with verbose output
+node bin/ajelcode.js "test" --debug
+
+# Check config loading
+node -e "import('./src/config.js').then(m => console.log(m.loadConfig()))"
+```
+
+---
+
+🤝 Contributing
+
+Step Action
+1️⃣ Fork the repository
+2️⃣ Create your feature branch: git checkout -b feature/AmazingFeature
+3️⃣ Commit your changes: git commit -m 'Add some AmazingFeature'
+4️⃣ Push to the branch: git push origin feature/AmazingFeature
+5️⃣ Open a Pull Request
+
+Development Setup
+
+```bash
+# Clone your fork
+git clone https://github.com/yourusername/ajelcode.git
+cd ajelcode
+
 # Install dependencies
 npm install
 
-# Link globally
+# Link globally for testing
 npm link
 
-# Test
+# Run tests
 ajelcode "test"
-
-# Unlink
-npm unlink -g ajelcode
 ```
 
 ---
 
-Performance
-
-Model Speed Quality Use Case
-llama-3.3-70b ⚡⚡⚡ ⭐⭐⭐⭐⭐ Production code
-llama-3.2-11b ⚡⚡⚡⚡ ⭐⭐⭐⭐ Fast prototyping
-mixtral-8x7b ⚡⚡⚡ ⭐⭐⭐⭐ Long documents
-gemma2-9b ⚡⚡⚡⚡ ⭐⭐⭐ Simple tasks
-
----
-
-Troubleshooting
-
-Invalid API Key
-
-```bash
-# Regenerate your key at Groq Console
-# Update conf.json or ~/.ajelcode/conf.json
-```
-
-Model Decommissioned
-
-```bash
-# Check available models: https://console.groq.com/docs/models
-# Update the model field in conf.json
-```
-
-Command Not Found
-
-```bash
-# Reinstall globally
-npm uninstall -g ajelcode
-npm install -g ajelcode
-
-# Or check PATH
-echo $PATH
-```
-
-Permission Denied
-
-```bash
-# Fix permissions
-chmod +x bin/ajelcode.js
-npm link
-```
-
----
-
-Contributing
-
-1. Fork the repository
-2. Create your feature branch (git checkout -b feature/AmazingFeature)
-3. Commit your changes (git commit -m 'Add some AmazingFeature')
-4. Push to the branch (git push origin feature/AmazingFeature)
-5. Open a Pull Request
-
----
-
-License
+📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
----
+```
+MIT License
 
-Acknowledgments
+Copyright (c) 2026 Ajel
 
-· Groq for their incredibly fast inference
-· OpenAI SDK for the client
-· Commander.js for CLI parsing
-· Chalk for beautiful terminal colors
-
----
-
-Support
-
-· Create an Issue
-· Star the repository
-· Follow for updates
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction...
+```
 
 ---
 
-Made with care for developers who want to code faster.
+🙏 Acknowledgments
+
+Tool/Library Purpose
+Groq Incredibly fast inference
+OpenAI SDK API client
+Commander.js CLI parsing
+Chalk Terminal colors
+
+---
+
+📞 Support & Community
+
+· 🐛 Report issues: GitHub Issues
+· ⭐ Star the repo: Show your support
+· 🔔 Follow for updates: Stay tuned for new features
+
+---
+
+<div align="center">
+
+Made with ❤️ for developers who want to code faster
 
 ```bash
 ajelcode "make something amazing"
+```
+
+Happy Coding! 🚀
+
+</div>
 ```
