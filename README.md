@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/tutucucucu/ajelcode">
+  <a href="https://github.com/tutucucucu/Ajelcode">
     <img src="https://img.shields.io/github/stars/tutucucucu/ajelcode?style=social" alt="GitHub stars">
   </a>
-  <a href="https://www.npmjs.com/package/Ajelcode">
+  <a href="https://www.npmjs.com/package/ajelcode">
     <img src="https://img.shields.io/npm/v/ajelcode.svg" alt="npm version">
   </a>
   <a href="https://www.npmjs.com/package/ajelcode">
