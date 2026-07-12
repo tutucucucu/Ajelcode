@@ -1,6 +1,6 @@
 {
   "name": "ajelcode",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "AI-powered CLI coding assistant with session management and API key support",
   "type": "module",
   "main": "bin/ajelcode.js",
@@ -55,7 +55,8 @@
   "os": [
     "linux",
     "darwin",
-    "win32"
+    "win32",
+    "android"
   ],
   "files": [
     "bin/",
