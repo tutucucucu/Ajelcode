@@ -2,8 +2,12 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
 
-const API_BASE = 'https://api-keys.catpuffcake.workers.dev';
+const API_BASE = 'https://api.catpuffcake.workers.dev';
 const SECRET = 'Ajajelimups';
+
+// Cooldown tracking
+let lastGenerateTime = 0;
+const COOLDOWN_SECONDS = 30;
 
 export async function manageAPIKeys() {
   console.clear();
@@ -15,16 +19,19 @@ export async function manageAPIKeys() {
       name: 'action',
       message: chalk.cyan('What would you like to do?'),
       choices: [
-        { name: 'Generate New API Key', value: 'generate' },
+        { name: 'Get Browser Token', value: 'browser' },
+        { name: 'Generate API Key (30s cooldown)', value: 'generate' },
         { name: 'Check API Key', value: 'check' },
         { name: 'Delete API Key', value: 'delete' },
-        { name: 'Get Browser Token', value: 'browser' },
         { name: 'Back', value: 'back' }
       ]
     }
   ]);
 
   switch (action) {
+    case 'browser':
+      await getBrowserToken();
+      break;
     case 'generate':
       await generateAPIKey();
       break;
@@ -34,14 +41,10 @@ export async function manageAPIKeys() {
     case 'delete':
       await deleteAPIKey();
       break;
-    case 'browser':
-      await getBrowserToken();
-      break;
     case 'back':
       return;
   }
 
-  // Kembali ke menu setelah aksi selesai
   const { again } = await inquirer.prompt([
     {
       type: 'confirm',
@@ -57,12 +60,35 @@ export async function manageAPIKeys() {
 }
 
 async function generateAPIKey() {
+  // Check cooldown
+  const now = Date.now();
+  const elapsed = (now - lastGenerateTime) / 1000;
+  
+  if (elapsed < COOLDOWN_SECONDS) {
+    const remaining = Math.ceil(COOLDOWN_SECONDS - elapsed);
+    console.log(chalk.yellow(`\n⏳ Please wait ${remaining} seconds before generating another key.\n`));
+    return;
+  }
+
+  // Get browser token first
+  let browserToken = await getBrowserTokenFromConfig();
+  
+  if (!browserToken) {
+    console.log(chalk.yellow('\nNo browser token found. Getting one...\n'));
+    const result = await getBrowserToken();
+    if (!result) {
+      console.log(chalk.red('Failed to get browser token.'));
+      return;
+    }
+    browserToken = result;
+  }
+
   const { name } = await inquirer.prompt([
     {
       type: 'input',
       name: 'name',
       message: chalk.green('Enter API key name:'),
-      default: 'My API Key'
+      default: 'AjelCode Key'
     }
   ]);
 
@@ -72,71 +98,123 @@ async function generateAPIKey() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-SECRET': SECRET
+        'X-SECRET': SECRET,
+        'Cookie': `browser_token=${browserToken}`
       },
       body: JSON.stringify({ name })
     });
 
     const data = await response.json();
-    spinner.succeed('API Key Generated!');
-    console.log(chalk.green('\nYour API Key:'));
-    console.log(chalk.cyan.bold(data.apiKey));
-    console.log(chalk.gray('\nSave this key securely. It will not be shown again.'));
+    
+    if (data.success) {
+      spinner.succeed('API Key Generated!');
+      console.log(chalk.green('\nYour API Key:'));
+      console.log(chalk.cyan.bold(data.apiKey));
+      console.log(chalk.gray('\nSave this key securely. It will not be shown again.'));
+      
+      // Update cooldown
+      lastGenerateTime = Date.now();
+      console.log(chalk.yellow(`\n⏳ Next generation available in ${COOLDOWN_SECONDS} seconds.`));
 
-    // Tanya apakah mau simpan ke config
-    const { save } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'save',
-        message: chalk.green('Save this API key to config?'),
-        default: true
+      const { save } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'save',
+          message: chalk.green('Save this API key to config?'),
+          default: true
+        }
+      ]);
+
+      if (save) {
+        const { loadConfig, saveConfig } = await import('./config.js');
+        const config = loadConfig();
+        config.apiKey = data.apiKey;
+        config.browserToken = browserToken;
+        saveConfig(config);
+        console.log(chalk.green('API key saved to conf.json'));
       }
-    ]);
-
-    if (save) {
-      const { loadConfig, saveConfig } = await import('./config.js');
-      const config = loadConfig();
-      config.apiKey = data.apiKey;
-      saveConfig(config);
-      console.log(chalk.green('API key saved to conf.json'));
+    } else {
+      spinner.fail('Failed: ' + (data.message || 'Unknown error'));
     }
 
   } catch (error) {
     spinner.fail('Error: ' + error.message);
-    console.log(chalk.red('Make sure the API server is accessible.'));
+  }
+}
+
+async function getBrowserTokenFromConfig() {
+  try {
+    const { loadConfig } = await import('./config.js');
+    const config = loadConfig();
+    return config.browserToken || null;
+  } catch {
+    return null;
+  }
+}
+
+async function getBrowserToken() {
+  const spinner = ora('Getting browser token...').start();
+  try {
+    const response = await fetch(`${API_BASE}/api/browser`);
+    const data = await response.json();
+    
+    if (data.success) {
+      spinner.succeed('Browser Token Retrieved!');
+      console.log(chalk.green('\nYour Browser Token:'));
+      console.log(chalk.cyan.bold(data.browserToken));
+      console.log(chalk.gray('\nThis token is required for API key validation.'));
+      
+      // Save to config
+      const { loadConfig, saveConfig } = await import('./config.js');
+      const config = loadConfig();
+      config.browserToken = data.browserToken;
+      saveConfig(config);
+      console.log(chalk.green('Browser token saved to conf.json'));
+      
+      return data.browserToken;
+    } else {
+      spinner.fail('Failed to get browser token');
+      return null;
+    }
+
+  } catch (error) {
+    spinner.fail('Error: ' + error.message);
+    return null;
   }
 }
 
 async function checkAPIKey() {
-  const { apiKey, browserToken } = await inquirer.prompt([
+  const { apiKey } = await inquirer.prompt([
     {
       type: 'password',
       name: 'apiKey',
       message: chalk.green('Enter API key:'),
       mask: '*'
-    },
-    {
-      type: 'password',
-      name: 'browserToken',
-      message: chalk.green('Enter browser token (optional):'),
-      mask: '*',
-      default: ''
     }
   ]);
 
+  // Get browser token
+  let browserToken = await getBrowserTokenFromConfig();
+  if (!browserToken) {
+    console.log(chalk.yellow('\nNo browser token found. Getting one...\n'));
+    browserToken = await getBrowserToken();
+    if (!browserToken) {
+      console.log(chalk.red('Failed to get browser token.'));
+      return;
+    }
+  }
+
   const spinner = ora('Checking API key...').start();
   try {
-    const payload = { apiKey };
-    if (browserToken) {
-      payload.browserToken = browserToken;
-    }
-
     const response = await fetch(`${API_BASE}/api/apikeys/check`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ 
+        apiKey, 
+        browserToken 
+      })
     });
 
     const data = await response.json();
@@ -153,7 +231,6 @@ async function checkAPIKey() {
 
   } catch (error) {
     spinner.fail('Error: ' + error.message);
-    console.log(chalk.red('Could not connect to API server.'));
   }
 }
 
@@ -166,6 +243,17 @@ async function deleteAPIKey() {
       mask: '*'
     }
   ]);
+
+  // Get browser token
+  let browserToken = await getBrowserTokenFromConfig();
+  if (!browserToken) {
+    console.log(chalk.yellow('\nNo browser token found. Getting one...\n'));
+    browserToken = await getBrowserToken();
+    if (!browserToken) {
+      console.log(chalk.red('Failed to get browser token.'));
+      return;
+    }
+  }
 
   const { confirm } = await inquirer.prompt([
     {
@@ -189,39 +277,29 @@ async function deleteAPIKey() {
         'Content-Type': 'application/json',
         'X-SECRET': SECRET
       },
-      body: JSON.stringify({ apiKey })
+      body: JSON.stringify({ 
+        apiKey, 
+        browserToken 
+      })
     });
 
     const data = await response.json();
     
     if (data.success) {
       spinner.succeed('API Key Deleted!');
+      // Remove from config if exists
+      const { loadConfig, saveConfig } = await import('./config.js');
+      const config = loadConfig();
+      if (config.apiKey === apiKey) {
+        config.apiKey = null;
+        saveConfig(config);
+        console.log(chalk.green('API key removed from config.'));
+      }
     } else {
-      spinner.fail('Failed to delete API key');
+      spinner.fail('Failed to delete API key: ' + (data.message || 'Unknown error'));
     }
 
   } catch (error) {
     spinner.fail('Error: ' + error.message);
   }
-}
-
-async function getBrowserToken() {
-  const spinner = ora('Getting browser token...').start();
-  try {
-    const response = await fetch(`${API_BASE}/api/browser`);
-    const data = await response.json();
-    
-    if (data.success) {
-      spinner.succeed('Browser Token Retrieved!');
-      console.log(chalk.green('\nYour Browser Token:'));
-      console.log(chalk.cyan.bold(data.browserToken));
-      console.log(chalk.gray('\nThis token is required for API key validation.'));
-    } else {
-      spinner.fail('Failed to get browser token');
-    }
-
-  } catch (error) {
-    spinner.fail('Error: ' + error.message);
-    console.log(chalk.red('Could not connect to API server.'));
   }
-}
