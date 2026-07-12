@@ -1,7 +1,8 @@
 {
   "prefix": true,
-  "model": "llama-3.3-70b-versatile",
-  "apiKey": "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",
+  "model": "gpt-3.5-turbo",
+  "apiKey": "ajel_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "browserToken": "br_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
   "temperature": 0.1,
   "maxTokens": 4096,
   "colors": true
