@@ -7,10 +7,17 @@ const SESSION_FILE = join(process.cwd(), '.ajelcode_session.json');
 
 export async function askAI(prompt, options = {}) {
   const config = loadConfig();
-  const apiKey = options.apiKey || config.apiKey || process.env.GROQ_API_KEY;
+  const apiKey = options.apiKey || config.apiKey || process.env.AJEL_API_KEY;
   
   if (!apiKey) {
-    throw new Error('API key not found. Set in conf.json or GROQ_API_KEY env');
+    throw new Error('API key not found. Generate with: ajelcode api');
+  }
+
+  // Get browser token from config
+  const browserToken = config.browserToken || process.env.AJEL_BROWSER_TOKEN;
+  
+  if (!browserToken) {
+    throw new Error('Browser token not found. Run: ajelcode api -> Get Browser Token');
   }
 
   const systemPrompt = `You are AjelCode, an AI coding assistant. Your ONLY job is to generate code files.
@@ -43,25 +50,37 @@ console.log('Hello Ajel');
 
 Now generate code for the user's request.`;
 
-  const model = options.model || config.model || 'llama-3.3-70b-versatile';
-
-  let messages = [
-    { role: 'system', content: systemPrompt }
-  ];
+  // Build messages with session
+  let messages = [];
 
   if (options.useSession !== false) {
     const session = getSession();
     if (session && session.length > 0) {
-      messages = messages.concat(session);
+      // Add system prompt as first message if session exists
+      messages = [
+        { role: 'system', content: systemPrompt },
+        ...session
+      ];
+    } else {
+      messages = [
+        { role: 'system', content: systemPrompt }
+      ];
     }
+  } else {
+    messages = [
+      { role: 'system', content: systemPrompt }
+    ];
   }
 
   messages.push({ role: 'user', content: prompt });
 
-  // Batasi history agar request tidak terlalu besar
+  // Batasi history
   if (messages.length > 21) {
     messages = [messages[0], ...messages.slice(-20)];
   }
+
+  // Custom prompt untuk API
+  const customPrompt = `You are an AI language model named AjelCode, designed to generate code files. Always respond with code only using the ### FILE: format. Never use markdown backticks or explanations.`;
 
   let lastError;
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -69,23 +88,44 @@ Now generate code for the user's request.`;
       console.log(`Attempt ${attempt}...`);
       
       const response = await axios.post(
-        'https://api.groq.com/openai/v1/chat/completions',
+        'https://api.catpuffcake.workers.dev/chat',
         {
-          model: model,
-          messages: messages,
-          temperature: Number(config.temperature ?? 0.1),
-          max_tokens: Number(config.maxTokens ?? 4096)
+          message: prompt,
+          prompt: customPrompt,
+          messages: messages // Kirim history juga
         },
         {
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-API': apiKey,
+            'X-BROWSER': browserToken
           },
           timeout: 60000
         }
       );
 
-      const content = response.data.choices?.[0]?.message?.content ?? '';
+      // Ambil response dari data
+      let content = '';
+      
+      if (response.data.success && response.data.data) {
+        // Response dari ChatEverywhere via worker
+        const data = response.data.data;
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+          content = data.choices[0].message.content;
+        } else if (data.response) {
+          content = data.response;
+        } else if (typeof data === 'string') {
+          content = data;
+        } else {
+          content = JSON.stringify(data);
+        }
+      } else if (response.data.response) {
+        content = response.data.response;
+      } else if (response.data.message) {
+        content = response.data.message;
+      } else {
+        content = JSON.stringify(response.data);
+      }
 
       if (options.useSession !== false && content) {
         saveToSession(prompt, content);
@@ -135,7 +175,6 @@ export function saveToSession(prompt, response) {
       { role: 'assistant', content: response }
     );
     
-    // Simpan maksimal 10 percakapan (20 pesan)
     if (session.messages.length > 20) {
       session.messages = session.messages.slice(-20);
     }
