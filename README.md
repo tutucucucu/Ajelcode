@@ -6,14 +6,22 @@
 
 <p align="center">
   <strong>AI-Powered CLI Coding Assistant</strong><br>
-  Turn natural language into code files instantly with Groq — now with sessions, API key management, and an interactive menu
+  Turn natural language into code files instantly — with sessions, API key management, and an interactive menu
 </p>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/version-1.0.0-blue.svg?style=for-the-badge" alt="Version"></a>
-  <a href="#"><img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg?style=for-the-badge" alt="Node.js"></a>
-  <a href="#"><img src="https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge" alt="License"></a>
-  <a href="#"><img src="https://img.shields.io/badge/powered%20by-Groq-orange.svg?style=for-the-badge" alt="Groq"></a>
+  <a href="https://github.com/tutucucucu/ajelcode">
+    <img src="https://img.shields.io/github/stars/tutucucucu/ajelcode?style=social" alt="GitHub stars">
+  </a>
+  <a href="https://www.npmjs.com/package/ajelcode">
+    <img src="https://img.shields.io/npm/v/ajelcode.svg" alt="npm version">
+  </a>
+  <a href="https://www.npmjs.com/package/ajelcode">
+    <img src="https://img.shields.io/npm/dt/ajelcode.svg" alt="npm downloads">
+  </a>
+  <a href="https://github.com/tutucucucu/ajelcode/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/tutucucucu/ajelcode.svg" alt="License">
+  </a>
 </p>
 
 ---
@@ -26,7 +34,6 @@
 - [Commands](#-commands)
 - [Configuration](#-configuration)
 - [API Key Management](#-api-key-management)
-- [Available Models](#-available-models)
 - [Usage Examples](#-usage-examples)
 - [Project Structure](#-project-structure)
 - [Session Management](#-session-management)
@@ -48,6 +55,7 @@
 | ⚡ **Blazing Fast** | Powered by Groq's ultra-low latency inference |
 | 🌍 **Global CLI** | Use from any directory on your system |
 | 🎨 **Customizable** | Configure models, temperature, and more |
+| 🛡️ **Anti-Spam** | 30 second cooldown for API key generation |
 
 ---
 
@@ -129,8 +137,9 @@ Create `conf.json` in your project root or `~/.ajelcode/`:
 
 ```json
 {
-  "model": "llama-3.3-70b-versatile",
-  "apiKey": "your-groq-api-key",
+  "model": "gpt-3.5-turbo",
+  "apiKey": "your-api-key-here",
+  "browserToken": "your-browser-token-here",
   "temperature": 0.1,
   "maxTokens": 4096,
   "colors": true
@@ -155,10 +164,10 @@ ajelcode api
 
 Menu options:
 
-- Generate New API Key
+- Get Browser Token (first time setup)
+- Generate API Key (30s cooldown)
 - Check API Key
 - Delete API Key
-- Get Browser Token
 
 ### Manual API Key Generation
 
@@ -177,18 +186,6 @@ Response:
   "apiKey": "ajel_sk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }
 ```
-
----
-
-## 🧠 Available Models
-
-| Model | Speed | Quality | Best For |
-|-------|-------|---------|----------|
-| `llama-3.3-70b-versatile` | Medium | Best | Production code |
-| `llama-3.2-90b-vision-preview` | Slow | Best | Complex tasks |
-| `llama-3.2-11b-vision-preview` | Fast | Good | Prototyping |
-| `mixtral-8x7b-32768` | Medium | Good | Long context |
-| `gemma2-9b-it` | Fast | Medium | Simple tasks |
 
 ---
 
@@ -244,7 +241,7 @@ ajelcode/
 Sessions are stored in `.ajelcode_session.json` in the current directory.
 
 - Chat history preserved across commands
-- Last 50 messages kept
+- Last 20 messages kept
 - Sessions persist until cleared
 
 ### Session Commands
@@ -266,10 +263,12 @@ ajelcode session -c
 
 | Issue | Solution |
 |-------|----------|
-| Invalid API Key | Run `ajelcode api` to generate/check key |
+| Invalid API Key | Run `ajelcode api` to generate a new key |
+| Browser token missing | Run `ajelcode api` → Get Browser Token |
 | Model not found | Update config with an available model |
 | Command not found | Reinstall: `npm install -g ajelcode` |
 | Session not saving | Check write permissions in current directory |
+| Permission denied | Run: `chmod +x /data/data/com.termux/files/usr/bin/ajelcode` |
 
 ---
 
