@@ -13,7 +13,7 @@
   <a href="https://github.com/tutucucucu/ajelcode">
     <img src="https://img.shields.io/github/stars/tutucucucu/ajelcode?style=social" alt="GitHub stars">
   </a>
-  <a href="https://www.npmjs.com/package/ajelcode">
+  <a href="https://www.npmjs.com/package/Ajelcode">
     <img src="https://img.shields.io/npm/v/ajelcode.svg" alt="npm version">
   </a>
   <a href="https://www.npmjs.com/package/ajelcode">
